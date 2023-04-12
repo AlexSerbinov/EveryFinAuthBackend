@@ -1,0 +1,167 @@
+---
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: API-User
+  description: API documentation for the User service
+basePath: /api-user
+schemes:
+  - http
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+securityDefinitions:
+  JWT:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: Value: "Bearer {token}"
+definitions:
+  User:
+    type: object
+    required:
+      - email
+      - password
+      - confirmPassword
+      - login
+    properties:
+      email:
+        type: string
+        format: email
+      password:
+        type: string
+        format: password
+      confirmPassword:
+        type: string
+        format: password
+      login:
+        type: string
+      masterNodeAddress:
+        type: string
+  Password:
+    type: object
+    properties:
+      password:
+        type: string
+        format: password
+      confirmPassword:
+        type: string
+        format: password
+      token:
+        type: string
+  Token:
+    type: object
+    properties:
+      token:
+        type: string
+  Captcha:
+    type: object
+    properties:
+      captcha:
+        type: string
+  Login:
+    type: object
+    properties:
+      email:
+        type: string
+        format: email
+      password:
+        type: string
+  Verification:
+    type: object
+    properties:
+      token:
+        type: string
+  ResetPassword:
+    type: object
+    properties:
+      token:
+        type: string
+      password:
+        type: string
+        format: password
+      confirmPassword:
+        type: string
+        format: password
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+  Success:
+    type: object
+    properties:
+      success:
+        type: boolean
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      description: Register user
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: User object that needs to be registered
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Successfully registered a new user
+          schema:
+            $ref: '#/definitions/Success'
+        '400':
+          description: Invalid input or email already exists
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      description: Login user and return JWT token
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          description: Login credentials
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        '200':
+          description: Successfully logged in a user
+          schema:
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+              userId:
+                type: string
+              avatar:
+                type: string
+              email:
+                type: string
+              name:
+                type: string
+              lastName:
+                type: string
+              publicProfileBio:
+                type: string
+              isVerified:
+                type: boolean
+              login:
+                type: string
+        '400':
+         

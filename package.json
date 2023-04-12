@@ -1,0 +1,48 @@
+{
+	"name": "nodejsapi",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "mocha test/test.js",
+		"start": "nodemon src/server.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@sendgrid/mail": "^6.4.0",
+		"bcrypt": "^5.0.0",
+		"body-parser": "^1.19.0",
+		"chai": "^4.2.0",
+		"chai-http": "^4.3.0",
+		"cloudinary": "^1.15.0",
+		"cors": "^2.8.5",
+		"datauri": "^2.0.0",
+		"dotenv": "^8.1.0",
+		"errorhandler": "^1.5.1",
+		"express": "^4.17.1",
+		"express-form-data": "^2.0.14",
+		"express-validator": "^6.2.0",
+		"geetest": "^4.1.2",
+		"jade": "^1.11.0",
+		"jsonwebtoken": "^8.5.1",
+		"mongoose": "^5.7.1",
+		"multer": "^1.4.2",
+		"node-fetch": "^2.6.1",
+		"nodemailer": "^6.4.14",
+		"passport": "^0.4.0",
+		"passport-jwt": "^4.0.0",
+		"passport-local": "^1.0.0",
+		"path": "^0.12.7",
+		"redis": "^3.0.2"
+	},
+	"devDependencies": {
+		"mocha": "^8.2.1",
+		"nodemon": "^1.19.4",
+		"should": "^13.2.3"
+	},
+	"resolutions": {
+		"jss": "10.0.0"
+	}
+}
