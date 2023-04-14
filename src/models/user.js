@@ -196,7 +196,7 @@ UserSchema.methods.generateRefreshToken = function () {
 	const User = this;
 	const secret = REFRESH_TOKEN_SECRET;
 	const refreshToken = jwt.sign({ _id: User._id }, secret, {
-		expiresIn: '1m',
+		expiresIn: '1h',
 	});
 	User.refreshToken = refreshToken;
 };

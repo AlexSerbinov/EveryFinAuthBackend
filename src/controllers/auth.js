@@ -6,7 +6,7 @@ const { eventMailPrepair } = require('../services/notificationService/emailSende
 const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, oneSpecialChar, isEthereumAddress } = require('../middlewares/cusotomValidator.js');
 const { genRandHex } = require('../services/genRandHex');
 
-const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_USER_NOT_VERIFICATION, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID, ERROR_PASSWORD_NOT_MATCH, ERROR_USER_ALREADY_VERIFIED, ERROR_WRONG_PASSWORD, ERROR_WRONG_EMAIL, ERROR_WRONG_MASTERNODE_ADDRESS, MISSING_CAPTCHA_DATA, CAPTCHA_VALIDATION_ERROR } = require('../const/const.js');
+const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_EMAIL_PASSWORD_INVALID, ERROR_USER_NOT_VERIFICATION, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID, ERROR_PASSWORD_NOT_MATCH, ERROR_USER_ALREADY_VERIFIED, ERROR_WRONG_PASSWORD, ERROR_WRONG_EMAIL, ERROR_WRONG_MASTERNODE_ADDRESS, MISSING_CAPTCHA_DATA, CAPTCHA_VALIDATION_ERROR } = require('../const/const.js');
 
 // @route POST api/auth/register
 // @desc Register user
@@ -17,22 +17,22 @@ exports.register = async (req, res) => {
 		// const captchaValidation = await initedCaptcha.validate(req.body);
 		// if (!captchaValidation) return res.status(401).json({ message: CAPTCHA_VALIDATION_ERROR });
 
-		const { email, password, login } = req.body;
+		const { email, password } = req.body;
 		if (isEmail(email)) return res.status(500).json({ message: ERROR_WRONG_EMAIL });
 		if ((oneLowercaseChar(password), oneUppercaseChar(password), oneNumber(password), oneSpecialChar(password))) return res.status(500).json({ message: ERROR_WRONG_PASSWORD });
 		if (password != req.body.confirmPassword) return res.status(500).json({ message: ERROR_PASSWORD_NOT_MATCH });
 
 		let user = await User.findOne({ email });
 		if (user)
-			return res.status(401).json({
+			return res.status(400).json({
 				message: ERROR_EMAIL_TAKEN,
 			});
 
-		user = await User.findOne({ login });
-		if (user)
-			return res.status(401).json({
-				message: ERROR_LOGIN_TAKEN,
-			});
+		// user = await User.findOne({ login });
+		// if (user)
+		// 	return res.status(401).json({
+		// 		message: ERROR_LOGIN_TAKEN,
+		// 	});
 
 		const newUser = new User({ ...req.body, role: 'basic' });
 		newUser.userId = genRandHex(24);
@@ -58,11 +58,11 @@ exports.login = async (req, res) => {
 		let user = await User.findOne({ email });
 
 		if (!user)
-			return res.status(401).json({
-				message: ERROR_LOGIN_PASSWORD_INVALID,
+			return res.status(400).json({
+				message: ERROR_NO_USER,
 			});
 
-		if (!user.comparePassword(password)) return res.status(401).json({ message: ERROR_LOGIN_PASSWORD_INVALID });
+		if (!user.comparePassword(password)) return res.status(401).json({ message: ERROR_EMAIL_PASSWORD_INVALID });
 		// Make sure the user has been verified
 		if (!user.isVerified)
 			return res.status(401).json({
@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
 			lastName: user.lastName,
 			publicProfileBio: user.publicProfileBio,
 			isVerified: user.isVerified,
-			login: user.login,
+			// login: user.login,
 		});
 	} catch (error) {
 		console.error(error);
@@ -125,7 +125,7 @@ exports.verify = async (req, res) => {
 			userId: user.userId,
 			isVerified: user.isVerified,
 			email: user.email,
-			login: user.login,
+			// login: user.login,
 			address: user.address,
 			name: user.name,
 			lastName: user.lastName,
@@ -184,7 +184,7 @@ exports.resendToken = async (req, res) => {
 
 		if (!user)
 			return res.status(401).json({
-				message: ERROR_LOGIN_PASSWORD_INVALID,
+				message: ERROR_EMAIL_PASSWORD_INVALID,
 			});
 
 		if (user.isVerified)
