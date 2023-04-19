@@ -67,8 +67,8 @@ let eventMailPrepair = async (eventName, email, params) => {
 			address: email,
 			params,
 		};
-		//console.log('\x1b[33m%s\x1b[0m', '----------------------------------------------');
-		//console.log(emailMsg);
+		console.log('\x1b[33m%s\x1b[0m', '----------------------------------------------');
+		console.log(emailMsg);
 		messageSender(JSON.stringify(emailMsg));
 		// }
 	} catch (error) {

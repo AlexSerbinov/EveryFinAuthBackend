@@ -1,6 +1,7 @@
-console.log(`======================= label ===================`);
 require('dotenv').config();
-
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('../swaggerConfig');
+const swaggerDocument = require('../swagger.json');
 // const redis = require('redis');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -14,7 +15,7 @@ const formData = require('express-form-data');
 // const redisController = require('./controllers/transactionScanner');
 
 // Setting up port
-const connUri = process.env.MONGO_LOCAL_CONN_URL;
+const connUri = process.env.MONGO_LOCAL_CONN_URL || "mongodb://localhost:27017/user"
 let PORT = +process.env.PORT || 7515;
 
 //=== 1 - CREATE APP
@@ -70,6 +71,7 @@ connection.on('error', (err) => {
 require('./routes/index')(app);
 
 //=== 5 - START SERVER
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(PORT, () => console.log('\x1b[33m%s\x1b[0m', 'Server running on http://localhost:' + PORT + '/'));
 
 // try {

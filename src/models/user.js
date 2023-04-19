@@ -180,12 +180,8 @@ UserSchema.methods.generateAccessToken = function () {
 	};
 
 	const secret = JWT_SECRET;
-	// console.log(`1----=-----=----=----=----=----=----- User -----=-----=-----=-----=-- 1`);
-	// console.log(User);
-	// console.log({ _id: User._id }, secret);
-	// console.log(`2----=-----=----=----=----=----=----- User -----=-----=-----=-----=-- 2`);
 	const token = jwt.sign({ _id: User._id }, secret, {
-		expiresIn: '1m',
+		expiresIn: '30m',
 	});
 	User.accessToken = token;
 };
@@ -196,7 +192,7 @@ UserSchema.methods.generateRefreshToken = function () {
 	const User = this;
 	const secret = REFRESH_TOKEN_SECRET;
 	const refreshToken = jwt.sign({ _id: User._id }, secret, {
-		expiresIn: '1h',
+		expiresIn: '2d',
 	});
 	User.refreshToken = refreshToken;
 };

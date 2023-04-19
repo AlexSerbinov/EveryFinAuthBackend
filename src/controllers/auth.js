@@ -3,47 +3,38 @@ const User = require('../models/user');
 const Token = require('../models/token');
 const jwt = require('jsonwebtoken');
 const { eventMailPrepair } = require('../services/notificationService/emailSender');
-const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, oneSpecialChar, isEthereumAddress } = require('../middlewares/cusotomValidator.js');
+const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, singlePasswordRegEx, oneSpecialChar, isEthereumAddress } = require('../middlewares/cusotomValidator.js');
 const { genRandHex } = require('../services/genRandHex');
 
-const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_EMAIL_PASSWORD_INVALID, ERROR_USER_NOT_VERIFICATION, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID, ERROR_PASSWORD_NOT_MATCH, ERROR_USER_ALREADY_VERIFIED, ERROR_WRONG_PASSWORD, ERROR_WRONG_EMAIL, ERROR_WRONG_MASTERNODE_ADDRESS, MISSING_CAPTCHA_DATA, CAPTCHA_VALIDATION_ERROR } = require('../const/const.js');
+const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_EMAIL_PASSWORD_INVALID,ERROR_REFRESH_TOKEN_REQUIRED, ERROR_USER_NOT_VERIFIED, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID, ERROR_PASSWORD_NOT_MATCH, ERROR_USER_ALREADY_VERIFIED, ERROR_WRONG_PASSWORD, ERROR_WRONG_EMAIL, ERROR_WRONG_MASTERNODE_ADDRESS, MISSING_CAPTCHA_DATA, CAPTCHA_VALIDATION_ERROR } = require('../const/const.js');
 
-// @route POST api/auth/register
+// @route POST api-user/auth/register
 // @desc Register user
 // @access Public
+
 exports.register = async (req, res) => {
-	try {
-		// const initedCaptcha = await captcha.init()
-		// const captchaValidation = await initedCaptcha.validate(req.body);
-		// if (!captchaValidation) return res.status(401).json({ message: CAPTCHA_VALIDATION_ERROR });
+    try {
+        const { email, password } = req.body;
+        if (isEmail(email)) return res.status(400).json({ message: ERROR_WRONG_EMAIL });
+        if (singlePasswordRegEx(password)) return res.status(400).json({ message: ERROR_WRONG_PASSWORD });
+        if (password != req.body.confirmPassword) return res.status(400).json({ message: ERROR_PASSWORD_NOT_MATCH });
 
-		const { email, password } = req.body;
-		if (isEmail(email)) return res.status(500).json({ message: ERROR_WRONG_EMAIL });
-		if ((oneLowercaseChar(password), oneUppercaseChar(password), oneNumber(password), oneSpecialChar(password))) return res.status(500).json({ message: ERROR_WRONG_PASSWORD });
-		if (password != req.body.confirmPassword) return res.status(500).json({ message: ERROR_PASSWORD_NOT_MATCH });
+        let user = await User.findOne({ email });
+        if (user)
+            return res.status(400).json({
+                message: ERROR_EMAIL_TAKEN,
+            });
 
-		let user = await User.findOne({ email });
-		if (user)
-			return res.status(400).json({
-				message: ERROR_EMAIL_TAKEN,
-			});
-
-		// user = await User.findOne({ login });
-		// if (user)
-		// 	return res.status(401).json({
-		// 		message: ERROR_LOGIN_TAKEN,
-		// 	});
-
-		const newUser = new User({ ...req.body, role: 'basic' });
-		newUser.userId = genRandHex(24);
-		const user_ = await newUser.save();
-		await sendVerificationEmail(user_, req, res);
-	} catch (error) {
-		res.status(500).json({ success: false, message: error.message });
-	}
+        const newUser = new User({ ...req.body, role: 'basic' });
+        newUser.userId = genRandHex(24);
+        const user_ = await newUser.save();
+        await sendVerificationEmail(user_, req, res);
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
 };
 
-// @route POST api/auth/login
+// @route POST api-user/auth/login
 // @desc Login user and return JWT token
 // @access Public
 exports.login = async (req, res) => {
@@ -53,10 +44,10 @@ exports.login = async (req, res) => {
 		// if (!captchaValidation) return res.status(401).json({ message: CAPTCHA_VALIDATION_ERROR });
 
 		const { email, password } = req.body;
-		if (!email || isEmail(email)) return res.status(500).json({ message: ERROR_WRONG_EMAIL });
-		if ((oneLowercaseChar(password), oneUppercaseChar(password), oneNumber(password), oneSpecialChar(password))) return res.status(500).json({ message: ERROR_WRONG_PASSWORD });
+		if (!email || isEmail(email)) return res.status(400).json({ message: ERROR_WRONG_EMAIL });
+		if (singlePasswordRegEx(password)) return res.status(400).json({ message: ERROR_WRONG_PASSWORD });
 		let user = await User.findOne({ email });
-
+		
 		if (!user)
 			return res.status(400).json({
 				message: ERROR_NO_USER,
@@ -66,7 +57,7 @@ exports.login = async (req, res) => {
 		// Make sure the user has been verified
 		if (!user.isVerified)
 			return res.status(401).json({
-				message: ERROR_USER_NOT_VERIFICATION,
+				message: ERROR_USER_NOT_VERIFIED,
 			});
 
 		await user.generateAccessToken();
@@ -87,12 +78,12 @@ exports.login = async (req, res) => {
 		});
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(400).json({ message: error.message });
 	}
 };
 
 // ===EMAIL VERIFICATION
-// @route GET api/verify/:token
+// @route GET api-user/auth//verify/:token
 // @desc Verify token
 // @access Public
 exports.verify = async (req, res) => {
@@ -120,24 +111,14 @@ exports.verify = async (req, res) => {
 		await user.generateRefreshToken();
 
 		res.status(200).send({
-			accessToken: user.accessToken,
-			refreshToken: user.refreshToken,
-			userId: user.userId,
-			isVerified: user.isVerified,
-			email: user.email,
-			// login: user.login,
-			address: user.address,
-			name: user.name,
-			lastName: user.lastName,
-			avatar: user.avatar,
-			publicProfileBio: user.publicProfileBio,
+			success: true
 		});
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		res.status(400).json({ message: error.message });
 	}
 };
 
-// @route POST api/refreshToken
+// @route POST api-user/auth/refreshToken
 // @desc Regenerate access token by refresh
 // @access Public
 
@@ -147,7 +128,7 @@ exports.refreshToken = async (req, res) => {
 
 		if (!refreshToken) {
 			return res.status(401).send({
-				message: 'No refresh token provided',
+				message: ERROR_REFRESH_TOKEN_REQUIRED,
 			});
 		}
 
@@ -155,8 +136,8 @@ exports.refreshToken = async (req, res) => {
 		const user = await User.findOne(refreshToken._id).exec();
 
 		if (!user) {
-			return res.status(401).send({
-				message: 'User not found',
+			return res.status(400).send({
+				message: ERROR_NO_USER,
 			});
 		}
 
@@ -167,13 +148,12 @@ exports.refreshToken = async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		res.status(500).send({
-			error,
-		});
+		res.status(400).json({ message: error.message });
+
 	}
 };
 
-// @route POST api/resend
+// @route POST api-user/auth//resend
 // @desc Resend Verification Token
 // @access Public
 exports.resendToken = async (req, res) => {
@@ -183,18 +163,18 @@ exports.resendToken = async (req, res) => {
 		const user = await User.findOne({ email });
 
 		if (!user)
-			return res.status(401).json({
-				message: ERROR_EMAIL_PASSWORD_INVALID,
+			return res.status(400).json({
+				message: ERROR_NO_USER,
 			});
 
 		if (user.isVerified)
-			return res.status(400).json({
+			return res.status(403).json({
 				message: ERROR_USER_ALREADY_VERIFIED,
 			});
 
 		await sendVerificationEmail(user, req, res);
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		res.status(400).json({ message: error.message });
 	}
 };
 
@@ -215,9 +195,11 @@ async function sendVerificationEmail(user, req, res) {
 
 		res.status(200).json({
 			// message: 'A verification email has been sent to ' + user.email + '. need to use this link' + link,
-			message: 'A verification email has been sent to ' + user.email + '. need to use token for user confirmation: ' + token.token,
+			message: 'A verification email has been sent to ' + user.email + '. need to use token for user confirmation: ',
+			token: token.token
 		});
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		res.status(400).json({ message: error.message });
 	}
 }
+

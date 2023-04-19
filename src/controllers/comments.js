@@ -6,7 +6,7 @@ const { genRandHex } = require('../services/genRandHex');
 const { commentsGetter } = require('../services/comments/commentsGetter');
 
 const TOKEN_LIFE = +process.env.token_life;
-const { ERROR_NO_USER, ERROR_TOKEN_LIFETIME_IS_OVER, COMMENT_NOT_FOUND, COMMENT_NOT_PROVIDED, COMMENT_ID_NOT_PROVIDED, ERROR_CANNOT_REPLY_TO_REPLY } = require('../const/const.js');
+const { ERROR_NO_USER, ERROR_ACCESS_TOKEN_EXPIRED, COMMENT_NOT_FOUND, COMMENT_NOT_PROVIDED, COMMENT_ID_NOT_PROVIDED, ERROR_CANNOT_REPLY_TO_REPLY } = require('../const/const.js');
 
 // await Comments.deleteMany({});
 // @route POST api-user/comments
@@ -19,7 +19,7 @@ exports.pushComment = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > process.env.token_life) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		let userId = user.userId;
 		let login = user.login;
@@ -61,7 +61,7 @@ exports.replyByComment = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > process.env.token_life) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		const commentForReply = await Comments.findOne({ commentId: repliedToId });
 		if (!commentForReply) return res.status(500).json({ message: COMMENT_NOT_FOUND });
@@ -122,7 +122,7 @@ exports.deleteOneComment = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.commentId) return res.status(500).json({ message: COMMENT_ID_NOT_PROVIDED });
 
 		const commentId = req.body.commentId;
@@ -147,7 +147,7 @@ exports.deleteOneCommentAndReturnOther = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.commentId) return res.status(500).json({ message: COMMENT_ID_NOT_PROVIDED });
 		const commentId = req.body.commentId;
 
@@ -170,7 +170,7 @@ exports.updateOneComment = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.commentId) return res.status(500).json({ message: COMMENT_ID_NOT_PROVIDED });
 		if (!req.body.comment) return res.status(500).json({ message: COMMENT_NOT_PROVIDED });
 		const commentId = req.body.commentId;
@@ -196,7 +196,7 @@ exports.updateOneCommentAndReturnOther = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.commentId) return res.status(500).json({ message: COMMENT_ID_NOT_PROVIDED });
 		if (!req.body.comment) return res.status(500).json({ message: COMMENT_NOT_PROVIDED });
 

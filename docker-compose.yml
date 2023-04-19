@@ -1,46 +1,20 @@
-version: '3.8'
+version: '3'
 
 services:
-    mongodb:
-        image: mongo
-        restart: always
-        ports:
-            - 27018:27017
-        volumes:
-            - /home/docker/Volumes/reg_service:/data/db
-            # - /Volumes/reg_service:/data/db
-        container_name: mongo_reg_service
+  app:
+    build: .
+    container_name: everyfin_backend
+    ports:
+      - "7515:7515"
+    depends_on:
+      - test-mongo
+    environment:
+      - MONGO_LOCAL_CONN_URL=mongodb://test-mongo:27017/user
 
-    reg_service:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: reg_service
-        environment:
-            JWT_SECRET: ${JWT_SECRET}
-            MONGO_LOCAL_CONN_URL: '${MONGO_LOCAL_CONN_URL}'
-            PORT: '${PORT}'
-            CLOUD_NAME: '${CLOUD_NAME}'
-            CLOUD_API_KEY: '${CLOUD_API_KEY}'
-            CLOUD_API_SECRET: '${CLOUD_API_SECRET}'
-            SENDGRID_API_KEY: '${SENDGRID_API_KEY}'
-        container_name: reg_service
-        depends_on:
-            - mongodb
-        # volumes:
-        # - /home/alex/explorerAuthorization:/app
-        # - /home/dev-user/reg_service/blockchain-explorer
-        # - /app/node_modules/
-        restart: unless-stopped
-        ports:
-            - '7515:7515'
-        networks:
-            - explorer-network
-
-networks:
-    explorer-network:
-        driver: bridge
-        external: true
-
-volumes:
-    dbdata:
+  test-mongo:
+    image: mongo:latest
+    container_name: test-mongo
+    volumes:
+      - /var/lib/mongodb:/data/db
+    ports:
+      - "27017:27017"

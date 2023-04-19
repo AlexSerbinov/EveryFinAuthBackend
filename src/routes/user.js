@@ -1,6 +1,6 @@
 const express = require('express');
 const { check } = require('express-validator');
-const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_USER_NOT_VERIFICATION, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID } = require('../const/const.js');
+const { ERROR_LOGIN_PASSWORD_INVALID, ERROR_USER_NOT_VERIFIED, ERROR_EMAIL_TAKEN, ERROR_LOGIN_TAKEN, ERROR_NO_USER, ERROR_TOKEN_INVALID, ERROR_OLD_PASSWORD_INVALID } = require('../const/const.js');
 const multer = require('multer');
 const User = require('../controllers/user');
 const authenticate = require('../middlewares/authenticate');

@@ -9,8 +9,8 @@ exports.pushMail = async function (req, res) {
 		let email = req.body.email;
 		let type = req.body.type;
 		const mail = await Mails.findOne({ email });
-		if (isEmail(email)) return res.status(500).json({ message: "ERROR_WRONG_EMAIL" });
-		if(mail) return res.status(500).json({ message: "EMAIL_ALREADY_TAKEN" });
+		if (isEmail(email)) return res.status(400).json({ message: "ERROR_WRONG_EMAIL" });
+		if(mail) return res.status(400).json({ message: "EMAIL_ALREADY_TAKEN" });
 		if(type !== 'DEVELOPER' && type !== 'COMMUNITY') return res.status(500).json({ message: "ERROR_WRONG_TYPE" });
 
 		let emailData = {

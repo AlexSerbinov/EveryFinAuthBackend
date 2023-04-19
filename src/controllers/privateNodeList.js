@@ -3,7 +3,7 @@ const User = require('../models/user');
 const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, oneSpecialChar, notEmpty, isMasternodeAddress, isTxHash } = require('../middlewares/cusotomValidator.js');
 const { balancePinner, totalBalanceCounter } = require('../services/balancePinner.js');
 const TOKEN_LIFE = +process.env.token_life;
-const { ERROR_NO_USER, ERROR_TOKEN_LIFETIME_IS_OVER, TX_HASH_ALREADY_EXIST, TX_HASH_NOT_PROVIDED, TX_HASH_NOT_FOUND, ERROR_WRONG_TX_HASH,CURRENCY_NOT_PROVIDED, INVALID_CURRENCY,SEND_LIMIT_EXCEEDED, btcu, btcu_testnet } = require('../const/const.js');
+const { ERROR_NO_USER, ERROR_ACCESS_TOKEN_EXPIRED, TX_HASH_ALREADY_EXIST, TX_HASH_NOT_PROVIDED, TX_HASH_NOT_FOUND, ERROR_WRONG_TX_HASH,CURRENCY_NOT_PROVIDED, INVALID_CURRENCY,SEND_LIMIT_EXCEEDED, btcu, btcu_testnet } = require('../const/const.js');
 const { paginateData } = require('../services/paginateData');
 const { filterWatchListByCurrency } = require('../services/filterWatchListByCurrency');
 
@@ -18,7 +18,7 @@ exports.addToPrivateNodeList = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (isTxHash(req.body.txHash)) return res.status(500).json({ message: ERROR_WRONG_TX_HASH }); // регулярка для входящей транзакции
 		if (!req.body.txHash) return res.status(500).json({ message: TX_HASH_NOT_PROVIDED });
 		
@@ -64,7 +64,7 @@ exports.updatePrivateNodeListAddress = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.txHash) return res.status(500).json({ message: TX_HASH_NOT_PROVIDED });
 		// if (isMasternodeAddress(req.body.txHash)) return res.status(500).json({ message: ERROR_WRONG_TX_HASH });  регулярка на тх хэщ!
 
@@ -107,7 +107,7 @@ exports.getPrivateNodeListForUser = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		let currency = req.params.currency;
 		const privateNodeListWithCurrency = await filterWatchListByCurrency(user.privateNodeList, currency)
@@ -135,7 +135,7 @@ exports.deletePrivateNodeListAddress = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.txHash) return res.status(500).json({ message: TX_HASH_NOT_PROVIDED });
 	
 		let currency = req.body.currency;

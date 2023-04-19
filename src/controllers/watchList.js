@@ -4,7 +4,7 @@ const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, oneSpecialChar, 
 const { balancePinner, totalBalanceCounter } = require('../services/balancePinner.js');
 const { watchlistTagCounter } = require('../services/counters.js');
 const TOKEN_LIFE = +process.env.token_life;
-const { ERROR_NO_USER, ERROR_TOKEN_LIFETIME_IS_OVER, WATCHLIST_ADDRESS_ALREADY_EXIST, INVALID_NOTIFICATION_STATUS, INVALID_NOTIFICATION_DESTINATION, OFF, ALL, ONLY_INCOMING, INTERNAL, EMAIL, ONLY_OUTGOING, ERROR_WRONG_ADDRESS, WATCHLIST_ADDRESS_NOT_PROVIDED, WATCHLIST_ADDRESS_NOT_FOUND, CURRENCY_NOT_PROVIDED, INVALID_CURRENCY,SEND_LIMIT_EXCEEDED, btcu_testnet, btcu } = require('../const/const.js');
+const { ERROR_NO_USER, ERROR_ACCESS_TOKEN_EXPIRED, WATCHLIST_ADDRESS_ALREADY_EXIST, INVALID_NOTIFICATION_STATUS, INVALID_NOTIFICATION_DESTINATION, OFF, ALL, ONLY_INCOMING, INTERNAL, EMAIL, ONLY_OUTGOING, ERROR_WRONG_ADDRESS, WATCHLIST_ADDRESS_NOT_PROVIDED, WATCHLIST_ADDRESS_NOT_FOUND, CURRENCY_NOT_PROVIDED, INVALID_CURRENCY,SEND_LIMIT_EXCEEDED, btcu_testnet, btcu } = require('../const/const.js');
 const { paginateData } = require('../services/paginateData');
 const { filterWatchListByCurrency } = require('../services/filterWatchListByCurrency');
 // setInterval(() => {
@@ -21,7 +21,7 @@ exports.addToWatchList = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (isMasternodeAddress(req.body.address)) return res.status(500).json({ message: ERROR_WRONG_ADDRESS });
 		if (!req.body.address) return res.status(500).json({ message: WATCHLIST_ADDRESS_NOT_PROVIDED });
 		let currency = req.body.currency;
@@ -79,7 +79,7 @@ exports.updateWatchListAddress = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.address) return res.status(500).json({ message: WATCHLIST_ADDRESS_NOT_PROVIDED });
 		if (isMasternodeAddress(req.body.address)) return res.status(500).json({ message: ERROR_WRONG_ADDRESS });
 
@@ -135,7 +135,7 @@ exports.getWatchListForUser = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		let currency = req.params.currency;
 		const watchListWithCurrency = await filterWatchListByCurrency(user.watchList, currency)
@@ -169,7 +169,7 @@ exports.deleteWatchListAddress = async function (req, res) {
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		if (!req.body.address) return res.status(500).json({ message: WATCHLIST_ADDRESS_NOT_PROVIDED });
 
 		let currency = req.body.currency;

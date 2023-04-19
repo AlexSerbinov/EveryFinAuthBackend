@@ -4,7 +4,7 @@ const User = require('../models/user');
 const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, oneSpecialChar, notEmpty, isMasternodeAddress } = require('../middlewares/cusotomValidator.js');
 const {
 	ERROR_NO_USER,
-	ERROR_TOKEN_LIFETIME_IS_OVER,
+	ERROR_ACCESS_TOKEN_EXPIRED,
 	WATCHLIST_ADDRESS_ALREADY_EXIST,
 	INVALID_NOTIFICATION_STATUS,
 	INVALID_NOTIFICATION_DESTINATION,
@@ -35,7 +35,7 @@ exports.getLastNotification = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > process.env.token_life) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		email = user.email;
 		let currency = req.params.currency
@@ -80,7 +80,7 @@ exports.deleteOnetNotification = async function (req, res) {
 		const user = await User.findOne({ token });
 		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
 		if (Date.now() - user.jwtCreatedAt > process.env.token_life) {
-			return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+			return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		}
 		email = user.email;
 		let deleted = await WatchListTransactions.deleteOne({ _id });

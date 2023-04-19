@@ -1,0 +1,653 @@
+{
+  "swagger":"2.0",
+  "info":{
+     "title":"EveryFinBackend",
+     "version":"1.0.0"
+  },
+  "host":"localhost:7515",
+  "basePath":"/",
+  "schemes":[
+     "http"
+  ],
+  "paths":{
+     "/api-user/auth/register":{
+        "post":{
+           "tags":[
+              "Auth"
+           ],
+           "summary":"Register user",
+           "description":"Register a new user",
+           "operationId":"register",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "produces":[
+              "application/json"
+           ],
+           "parameters":[
+              {
+                 "name":"email",
+                 "in":"formData",
+                 "description":"User's email",
+                 "required":true,
+                 "type":"string",
+                 "default":"testmail@gmail.com"
+              },
+              {
+                 "name":"password",
+                 "in":"formData",
+                 "description":"User's password",
+                 "required":true,
+                 "type":"string",
+                 "default":"Qwerty12)"
+              },
+              {
+                 "name":"confirmPassword",
+                 "in":"formData",
+                 "description":"Confirm user's password",
+                 "required":true,
+                 "type":"string",
+                 "default":"Qwerty12)"
+              },
+              {
+                 "name":"address",
+                 "in":"formData",
+                 "description":"eth address",
+                 "required":false,
+                 "type":"string",
+                 "default":"0x3A0060f7e429e6a8c217B8229d232E8Da506aa57"
+              },
+              {
+                 "name":"name",
+                 "in":"formData",
+                 "description":"user first name",
+                 "required":false,
+                 "type":"string",
+                 "default":"John"
+              },
+              {
+                 "name":"lastName",
+                 "in":"formData",
+                 "description":"user last name",
+                 "required":false,
+                 "type":"string",
+                 "default":"Doe"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"successful operation",
+                 "schema":{
+                    "type":"object",
+                    "properties":{
+                       "message":{
+                          "type":"string"
+                       }
+                    }
+                 }
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_WRONG_EMAIL"
+                       },
+                       {
+                          "message":"ERROR_WRONG_PASSWORD"
+                       },
+                       {
+                          "message":"ERROR_PASSWORD_NOT_MATCH"
+                       },
+                       {
+                          "message":"ERROR_EMAIL_TAKEN"
+                       }
+                    ]
+                 }
+              },
+              "500":{
+                 "description":"Internal server error",
+                 "schema":{
+                    "type":"object",
+                    "properties":{
+                       "success":{
+                          "type":"boolean"
+                       },
+                       "message":{
+                          "type":"string"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/verify":{
+        "post":{
+           "tags":[
+              "Auth"
+           ],
+           "summary":"Token verify",
+           "description":"Verify a user's token",
+           "operationId":"verify",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "produces":[
+              "application/json"
+           ],
+           "parameters":[
+              {
+                 "name":"token",
+                 "in":"formData",
+                 "description":"User's token",
+                 "required":true,
+                 "type":"string",
+                 "default":"5d0b93047bdd944612843fa61b34e856826358dd"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"successful operation",
+                 "schema":{
+                    "type":"object",
+                    "properties":{
+                       "success":{
+                          "type":"boolean"
+                       }
+                    }
+                 }
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_TOKEN_INVALID"
+                       },
+                       {
+                          "message":"ERROR_USER_ALREADY_VERIFIED"
+                       }
+                    ]
+                 }
+              },
+              "500":{
+                 "description":"Internal server error",
+                 "schema":{
+                    "type":"object",
+                    "properties":{
+                       "message":{
+                          "type":"string"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/login":{
+        "post":{
+           "tags":[
+              "Auth"
+           ],
+           "summary":"Login",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "parameters":[
+              {
+                 "name":"email",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"testmail@gmail.com"
+              },
+              {
+                 "name":"password",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"Qwerty12)"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Login successful"
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_WRONG_EMAIL"
+                       },
+                       {
+                          "message":"ERROR_WRONG_PASSWORD"
+                       },
+                       {
+                          "message":"ERROR_NO_USER"
+                       }
+                    ]
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_EMAIL_PASSWORD_INVALID"
+                       }
+                    ]
+                 }
+              },
+              "403":{
+                 "description":"Forbiden",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_USER_NOT_VERIFIED"
+                       }
+                    ]
+                 }
+              },
+              "500":{
+                 "description":"Internal server error",
+                 "examples":{
+                    "application/json":[
+                       
+                    ]
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/resend":{
+        "post":{
+           "tags":[
+              "Auth"
+           ],
+           "summary":"Resend Verification Token",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "parameters":[
+              {
+                 "name":"email",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"testmail@gmail.com"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Verification token resent successfully"
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_NO_USER"
+                       }
+                    ]
+                 }
+              },
+              "403":{
+                 "description":"Forbidden",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_USER_ALREADY_VERIFIED"
+                       }
+                    ]
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/recover":{
+        "post":{
+           "tags":[
+              "Password"
+           ],
+           "summary":"Recover Password - Generates token and Sends password reset email",
+           "description":"This endpoint is used to generate a password reset token and send a password reset email to the user's email address",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "parameters":[
+              {
+                 "name":"email",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "description":"The user's email address",
+                 "default":"testmail@gmail.com"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Verification token resent successfully"
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "example1":{
+                       "summary":"Example error message for ERROR_NO_USER",
+                       "value":{
+                          "message":"ERROR_NO_USER"
+                       }
+                    }
+                 }
+              },
+              "403":{
+                 "description":"Forbidden",
+                 "examples":{
+                    "example1":{
+                       "summary":"Example error message for ERROR_USER_ALREADY_VERIFIED",
+                       "value":{
+                          "message":"ERROR_USER_ALREADY_VERIFIED"
+                       }
+                    }
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/checkResetToken":{
+        "post":{
+           "tags":[
+              "Password"
+           ],
+           "summary":"Reset Password - Validate password reset token and shows the password reset view",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "parameters":[
+              {
+                 "name":"token",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"example-token"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Token is valid",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"token is valid"
+                       }
+                    ]
+                 }
+              },
+              "400":{
+                 "description":"Invalid password recovery link",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"INVALID_PASSWORD_RECOVERY_LINK"
+                       }
+                    ]
+                 }
+              },
+              "500":{
+                 "description":"Internal server error",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"Error message"
+                       }
+                    ]
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/reset/":{
+        "post":{
+           "tags":[
+              "Password"
+           ],
+           "summary":"Reset Password",
+           "description":"This endpoint is used to validate a password reset token and show the password reset view",
+           "parameters":[
+              {
+                 "name":"token",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "description":"Reset token from recover method",
+                 "default":"5d0b93047bdd944612843fa61b34e856826358dd"
+              },
+              {
+                 "name":"password",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "description":"New password ",
+                 "default":"Qwerty14)"
+              },
+              {
+                 "name":"confirmPassword",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "description":"Confirm new password",
+                 "default":"Qwerty14)"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Password reset page rendered successfully",
+                 "content":{
+                    "text/html":{
+                       "schema":{
+                          "type":"string",
+                          "example":"<html><body><form><label for='password'>New Password:</label><input type='password' id='password' name='password'><br><label for='confirm_password'>Confirm Password:</label><input type='password' id='confirm_password' name='confirm_password'><br><input type='submit' value='Submit'></form></body></html>"
+                       }
+                    }
+                 }
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_PASSWORD_NOT_MATCH"
+                       },
+                       {
+                          "message":"ERROR_WRONG_PASSWORD"
+                       }
+                    ]
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_TOKEN_INVALID"
+                       }
+                    ]
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/changePassword":{
+        "put":{
+           "tags":[
+              "Password"
+           ],
+           "summary":"Reset Password",
+           "consumes":[
+              "application/x-www-form-urlencoded"
+           ],
+           "parameters":[
+              {
+                 "name":"oldPassword",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"Qwerty12)"
+              },
+              {
+                 "name":"password",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"Qwerty13)"
+              },
+              {
+                 "name":"confirmPassword",
+                 "in":"formData",
+                 "type":"string",
+                 "required":true,
+                 "default":"Qwerty13)"
+              },
+              {
+                 "name":"token",
+                 "in":"header",
+                 "type":"string",
+                 "required":true,
+                 "description":"Access token, format: 'token': 'token'"
+              }
+           ],
+           "responses":{
+              "200":{
+                 "description":"Password successfully changed",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"PASSWORD_SUCCESSFULLY_CHANGED"
+                       }
+                    ]
+                 }
+              },
+              "400":{
+                 "description":"Bad request",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_TOKEN_INVALID"
+                       },
+                       {
+                          "message":"ERROR_NO_USER"
+                       },
+                       {
+                          "message":"ERROR_PASSWORD_NOT_MATCH"
+                       },
+                       {
+                          "message":"ERROR_WRONG_PASSWORD"
+                       }
+                    ]
+                 }
+              },
+              "401":{
+                 "description":"Unauthorized",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"ERROR_ACCESS_TOKEN_REQUIRED"
+                       },
+                       {
+                          "message":"ERROR_LOGIN_PASSWORD_INVALID"
+                       },
+                       {
+                          "message":"ERROR_INVALID_ACCESS_TOKEN"
+                       },
+                       {
+                          "message":"ERROR_ACCESS_TOKEN_EXPIRED"
+                       }
+                    ]
+                 }
+              },
+              "500":{
+                 "description":"Internal server error",
+                 "examples":{
+                    "application/json":[
+                       {
+                          "message":"Error message"
+                       }
+                    ]
+                 }
+              }
+           }
+        }
+     },
+     "/api-user/auth/refreshToken": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Regenerate access token by refresh",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "refreshToken",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Refresh token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully generated new access token",
+            "examples": {
+              "application/json": [
+                {
+                  "accessToken": "NEW_ACCESS_TOKEN",
+                  "message": "succesfully generated new access token"
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": [
+                {
+                  "message": "ERROR_NO_USER"
+                },
+                {
+                  "message": "Error message"
+                }
+              ]
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "examples": {
+              "application/json": [
+                {
+                  "message": "ERROR_REFRESH_TOKEN_REQUIRED"
+                },
+                {
+                  "message": "ERROR_INVALID_REFRESH_TOKEN"
+                }
+              ]
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "examples": {
+              "application/json": [
+                {
+                  "message": "ERROR_REFRESH_TOKEN_EXPIRED"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+    
+  }
+}

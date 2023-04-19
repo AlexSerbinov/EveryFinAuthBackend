@@ -7,8 +7,8 @@ let should = chai.should();
 var path = require('path');
 const {
 	ERROR_NO_USER,
-	ERROR_TOKEN_LIFETIME_IS_OVER,
-	ERROR_USER_NOT_VERIFICATION,
+	ERROR_ACCESS_TOKEN_EXPIRED,
+	ERROR_USER_NOT_VERIFIED,
 	ERROR_USER_ALREADY_VERIFIED,
 	PASSWORD_SUCCESSFULLY_CHANGED,
 	WATCHLIST_ADDRESS_ALREADY_EXIST,
@@ -127,7 +127,7 @@ describe('register a new user', function () {
 
 describe('login before verify', function () {
 	this.timeout(10000);
-	it('should return the error wirh message "ERROR_USER_NOT_VERIFICATION"', (done) => {
+	it('should return the error wirh message "ERROR_USER_NOT_VERIFIED"', (done) => {
 		let body = {
 			email,
 			password,
@@ -140,7 +140,7 @@ describe('login before verify', function () {
 				res.should.have.status(401);
 				res.body.should.be.a('object');
 				res.body.should.have.property('message');
-				res.body.message.should.equal(ERROR_USER_NOT_VERIFICATION);
+				res.body.message.should.equal(ERROR_USER_NOT_VERIFIED);
 				done();
 			});
 	});

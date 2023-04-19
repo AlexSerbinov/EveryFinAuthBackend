@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const { uploader, sendEmail } = require('../utils/index');
 const TOKEN_LIFE = +process.env.token_life;
-const { ERROR_NO_USER, ERROR_TOKEN_LIFETIME_IS_OVER } = require('../const/const.js');
+const { ERROR_NO_USER, ERROR_ACCESS_TOKEN_EXPIRED } = require('../const/const.js');
 const jwt = require('jsonwebtoken');
 const { genRandHex } = require('../services/genRandHex');
 const { validationResult } = require('express-validator');
@@ -96,33 +96,33 @@ exports.deleteAllUsers = async function (req, res) {
 };
 
 // @route GET api-user/user/
-// @desc Returns a specific user by header
+// @desc Returns a specific user by access token
 // @access Public
 exports.show = async function (req, res) {
 	try {
-		let token = req.headers.authorization;
-		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
-		const user = await User.findOne({ token });
-
-		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
-		res.status(200).json({
-			token: user.token,
-			jwtCreatedAt: +user.jwtCreatedAt,
-			_id: user._id,
-			avatar: user.avatar,
-			email: user.email,
-			name: user.name,
-			lastName: user.lastName,
-			publicProfileBio: user.publicProfileBio,
-			isVerified: user.isVerified,
-			login: user.login,
-			masterNodeAddress: user.masterNodeAddress,
-		});
+	  console.log(`======================= getUser ===================`);
+  
+	  const { user } = req;
+  
+	  if (!user) {
+		return res.status(404).json({ message: ERROR_NO_USER });
+	  }
+  
+	  res.status(200).json({
+		_id: user._id,
+		avatar: user.avatar,
+		email: user.email,
+		name: user.name,
+		lastName: user.lastName,
+		publicProfileBio: user.publicProfileBio,
+		isVerified: user.isVerified,
+		login: user.login,
+		address: user.address,
+	  });
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+	  res.status(500).json({ message: error.message });
 	}
-};
+  };
 
 // @route PUT api/user/upload
 // @desc Update user details
@@ -132,8 +132,8 @@ exports.uploadAvatar = async function (req, res) {
 		let token = req.headers.authorization;
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
-		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (!user) return res.status(404).json({ message: ERROR_NO_USER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 
 		if (Object.keys(req.files).length != 0) {
 			const avatarLink = await uploader(req);
@@ -169,8 +169,8 @@ exports.deleteAvatar = async function (req, res) {
 		let token = req.headers.authorization;
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
-		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (!user) return res.status(404).json({ message: ERROR_NO_USER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		await User.findOneAndUpdate({ token }, { $set: { avatar: '' }, new: true });
 		const userNew = await User.findOne({ token });
 
@@ -201,8 +201,8 @@ exports.update = async function (req, res) {
 		let token = req.headers.authorization;
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
-		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (!user) return res.status(404).json({ message: ERROR_NO_USER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 
 		let userNew = await User.findOneAndUpdate({ token }, { $set: req.body, new: true }, { new: true });
 
@@ -232,8 +232,8 @@ exports.destroy = async function (req, res) {
 		let token = req.headers.authorization;
 		if (token.substr(0, 7) === 'Bearer ') token = token.substr(7);
 		const user = await User.findOne({ token });
-		if (!user) return res.status(401).json({ message: ERROR_NO_USER });
-		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_TOKEN_LIFETIME_IS_OVER });
+		if (!user) return res.status(400).json({ message: ERROR_NO_USER });
+		if (Date.now() - user.jwtCreatedAt > TOKEN_LIFE) return res.status(401).json({ message: ERROR_ACCESS_TOKEN_EXPIRED });
 		await User.findByIdAndDelete(user.id);
 		res.status(200).json({ message: 'User has been deleted' });
 	} catch (error) {
