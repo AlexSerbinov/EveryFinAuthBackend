@@ -2,7 +2,7 @@ const User = require('../models/user');
 // const WatchList = require('../models/watchList');
 const Token = require('../models/token');
 const jwt = require('jsonwebtoken');
-const { eventMailPrepair } = require('../services/notificationService/emailSender');
+const { eventMailPrepair, sendVerificationEmail} = require('../services/notificationService/emailSender');
 const { isEmail, oneLowercaseChar, oneUppercaseChar, oneNumber, singlePasswordRegEx, oneSpecialChar, isEthereumAddress } = require('../middlewares/cusotomValidator.js');
 const { genRandHex } = require('../services/genRandHex');
 
@@ -28,6 +28,10 @@ exports.register = async (req, res) => {
         const newUser = new User({ ...req.body, role: 'basic' });
         newUser.userId = genRandHex(24);
         const user_ = await newUser.save();
+		console.log(`1----=-----=----=----=----=----=----- user_ -----=-----=-----=-----=-- 1`)
+		console.log(user_);
+		console.log(`2----=-----=----=----=----=----=----- user_ -----=-----=-----=-----=-- 2`)
+		
         await sendVerificationEmail(user_, req, res);
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
@@ -178,28 +182,4 @@ exports.resendToken = async (req, res) => {
 	}
 };
 
-async function sendVerificationEmail(user, req, res) {
-	try {
-		const token = user.generateVerificationToken();
-		await token.save();
-		let to = user.email;
-		let link;
-		if (process.env.ENVIRONMENT === 'development') {
-			link = `${process.env.DEVELOPMENT_LINK}verification-user?token=${token.token}`;
-		} else link = `${process.env.PRODUCTION_LINK}verification-user?token=${token.token}`;
-		let params = {
-			confirmationLink: link,
-		};
-		eventMailPrepair('confirmRegistration', to, params);
-		// await sendEmail({ to, from, subject, html });
-
-		res.status(200).json({
-			// message: 'A verification email has been sent to ' + user.email + '. need to use this link' + link,
-			message: 'A verification email has been sent to ' + user.email + '. need to use token for user confirmation: ',
-			token: token.token
-		});
-	} catch (error) {
-		res.status(400).json({ message: error.message });
-	}
-}
 
