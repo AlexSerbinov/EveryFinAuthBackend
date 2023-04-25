@@ -28,10 +28,6 @@ exports.register = async (req, res) => {
         const newUser = new User({ ...req.body, role: 'basic' });
         newUser.userId = genRandHex(24);
         const user_ = await newUser.save();
-		console.log(`1----=-----=----=----=----=----=----- user_ -----=-----=-----=-----=-- 1`)
-		console.log(user_);
-		console.log(`2----=-----=----=----=----=----=----- user_ -----=-----=-----=-----=-- 2`)
-		
         await sendVerificationEmail(user_, req, res);
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });

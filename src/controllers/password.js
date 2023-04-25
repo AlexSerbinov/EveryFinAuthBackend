@@ -30,12 +30,9 @@ exports.recover = async (req, res) => {
 		let name = user.name;
 		let link;
 
-		if (process.env.ENVIRONMENT === 'development') {
-			link = `${process.env.DEVELOPMENT_LINK}reset-password?token=${user.resetPasswordToken}`;
-		} else link = `${process.env.PRODUCTION_LINK}reset-password?token=${user.resetPasswordToken}`;
-		// await sendEmail({ to, from, subject, html });
-		if (name) sendResetEmail(to, name, link);
-		else sendResetEmail(to, user.login, link);
+		await sendResetEmail(to, name, user.resetPasswordToken);
+		// if (name) sendResetEmail(to, name, resetPasswordToken);
+		// else sendResetEmail(to, user.login, resetPasswordToken);
 		if (process.env.ENVIRONMENT === 'development') res.status(200).json({ message: `The reset email has been sent to ${user.email}. To restore in development mode use this method "/reset" with token`, token: user.resetPasswordToken });
 		if (process.env.ENVIRONMENT === 'production')res.status(200).json({ message: `The reset email has been sent to ${user.email}` });
 	} catch (error) {
