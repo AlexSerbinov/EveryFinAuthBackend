@@ -71,7 +71,7 @@ exports.checkResetToken = async (req, res) => {
 			resetPasswordExpires: { $gt: Date.now() },
 		});
 		if (user) return res.status(200).json({ message: `token is valid` });
-		if (!user) return res.status(400).json({ message: INVALID_PASSWORD_RECOVERY_LINK });
+		if (!user) return res.status(400).json({ message: ERROR_TOKEN_INVALID });
 
 		//Redirect user to form with the email address
 		// res.render("reset", { user });

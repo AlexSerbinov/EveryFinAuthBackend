@@ -385,11 +385,11 @@
                  }
               },
               "400":{
-                 "description":"Invalid password recovery link",
+                 "description":"Token Invalid",
                  "examples":{
                     "application/json":[
                        {
-                          "message":"INVALID_PASSWORD_RECOVERY_LINK"
+                          "message":"ERROR_TOKEN_INVALID"
                        }
                     ]
                  }
