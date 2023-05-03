@@ -1,17 +1,21 @@
-const senderEmail = process.env.SENDER_EMAIL
-const senderPassword = process.env.SENDER_PASSWORD
+const senderEmail = process.env.SENDER_EMAIL;
+const senderPassword = process.env.SENDER_PASSWORD;
 
 const nodemailer = require('nodemailer');
 
 async function sendEmail({ to, subject, html }) {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
     auth: {
       user: senderEmail,
       pass: senderPassword,
     },
-    
-});
+    secure: false, // используйте STARTTLS, а не SSL/TLS
+    port: 587,
+    tls: {
+      rejectUnauthorized: true,
+    },
+  });
 
   const mailOptions = {
     from: 'support@everyfin.fi',

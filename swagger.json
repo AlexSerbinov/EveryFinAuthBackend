@@ -4,7 +4,7 @@
      "title":"EveryFinBackend",
      "version":"1.0.0"
   },
-  "host":"localhost:7515",
+  "host":"5.75.165.123:7515",
   "basePath":"/",
   "schemes":[
      "http"
@@ -510,11 +510,11 @@
                  "default":"Qwerty13)"
               },
               {
-                 "name":"token",
+                 "name":"Authorization",
                  "in":"header",
                  "type":"string",
                  "required":true,
-                 "description":"Access token, format: 'token': 'token'"
+                 "description":"Access token, format: 'Authorization': 'Baerer + token'"
               }
            ],
            "responses":{

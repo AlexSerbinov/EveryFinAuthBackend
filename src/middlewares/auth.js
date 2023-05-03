@@ -9,11 +9,19 @@ const {
 
 exports.auth = async (req, res, next) => {
   try {
-    const accessToken = req.body.token || req.query.token || req.headers.token;
+    // const accessToken = req.headers.token;
+    let accessToken = req.headers.authorization;
 
     if (!accessToken) {
       return res.status(401).send({ message: ERROR_ACCESS_TOKEN_REQUIRED });
     }
+
+    if (accessToken.startsWith("Baerer ")) {
+      // Удаление "Bearer " из заголовка
+      accessToken = accessToken.slice("Bearer ".length);
+      //
+      
+  }
     try {
       const decoded = jwt.verify(accessToken, JWT_SECRET);
       

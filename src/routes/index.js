@@ -3,6 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('../../swaggerConfig');
 const auth = require('./auth');
 const user = require('./user');
+const backendApi = require('./backendApi');
 const watchList = require('./watchList');
 const privateNodeList = require('./privateNodeList');
 const txNotifier = require('./txNotifier');
@@ -16,6 +17,7 @@ module.exports = (app) => {
 	app.use('/api-user/auth', auth);
 	app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 	app.use('/api-user/user', user);
+	app.use('/backend-api', backendApi);
 	// app.use('/api-user/watchList', watchList);
 	// app.use('/api-user/txNotifier', txNotifier);
 	// app.use('/api-user/privateNodeList', privateNodeList);

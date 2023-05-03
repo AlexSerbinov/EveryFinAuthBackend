@@ -119,7 +119,7 @@ exports.resetPassword = async (req, res) => {
 exports.changePassword = async (req, res) => {
 	try {
 		const { oldPassword, password, confirmPassword } = req.body;
-		const { user} = req;
+		const { user } = req;
 		let userFromModel = await User.findOne({ email:user.email });
 		if (!userFromModel) return res.status(400).json({ message: ERROR_NO_USER });
 		if (!userFromModel.comparePassword(oldPassword)) return res.status(401).json({ message: ERROR_LOGIN_PASSWORD_INVALID });

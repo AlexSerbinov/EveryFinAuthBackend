@@ -2,8 +2,11 @@ FROM node:14
 
 WORKDIR /app
 
-COPY . /app
+COPY package*.json ./
 
 RUN npm install
+RUN npm install -g nodemon
 
-CMD ["node", "src/server.js"]
+COPY . .
+
+CMD ["nodemon", "src/server.js"]

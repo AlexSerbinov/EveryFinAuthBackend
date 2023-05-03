@@ -8,17 +8,22 @@ const passwordChangedHthml = require('./templates/passwordChanged');
 
 const sendVerificationEmail = async (user, req, res) => {
 	try {
+		
 		const token = user.generateVerificationToken();
 		await token.save();
 		const to = user.email;
 		let link;
+		console.log(`1----=-----=----=----=----=----=----- verif token  -----=-----=-----=-----=-- 1`)
+		console.log(token);
+		console.log(`2----=-----=----=----=----=----=----- verif token  -----=-----=-----=-----=-- 2`)
+		
 		// if (process.env.ENVIRONMENT === 'development') {
-		// 	link = `${process.env.DEVELOPMENT_LINK}/api-user/auth/verify`;
-		// } else {
-		// 	link = `${process.env.PRODUCTION_LINK}/api-user/auth/verify`;
-		// }
-		link = `https://everyfin.machinalabs.net/auth/confirm-email?token=`
-		const html = await makeConfirmHtml(link, token.token);
+			// 	link = `${process.env.DEVELOPMENT_LINK}/api-user/auth/verify`;
+			// } else {
+				// 	link = `${process.env.PRODUCTION_LINK}/api-user/auth/verify`;
+				// }
+				link = `https://everyfin.machinalabs.net/auth/confirm-email/`
+				const html = await makeConfirmHtml(link, token.token);
 		await sendEmail({ to: to, subject: CONFIRM_REGISTRATION, html });
 		res.status(200).json({
 			message: `A verification email has been sent to ${user.email}`
@@ -31,7 +36,7 @@ const sendVerificationEmail = async (user, req, res) => {
 const sendResetEmail = async (to, name, resetPasswordToken) => {
 	try {
 		// const link = process.env.ENVIRONMENT === 'development' ? `${process.env.DEVELOPMENT_LINK}/api-user/auth/reset-password` : `${process.env.PRODUCTION_LINK}/api-user/auth/reset-password`;
-		const link = `https://everyfin.machinalabs.net/auth/reset-password?token=`
+		const link = `https://everyfin.machinalabs.net/auth/reset-password/`
 		const html = await makeResetHtml(link, resetPasswordToken);
 		await sendEmail({ to, subject: RESTORE_PASSWORD, html });
 	} catch (error) {
