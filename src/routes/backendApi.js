@@ -18,7 +18,9 @@ const backendApi = require('../controllers/backendApi');
 // router.post('/register', validate, Auth.register);
 
 router.get('/joe-tokenlists', backendApi.joeTokenlists);
-router.get('/', backendApi.joeTokenlists);
+router.get('/covalent/tokenBalancesByAddress/:address', backendApi.getTokenBalancesByAddress);
+router.get('/covalent/portfolioByAddress/:address', backendApi.getPortfolioByAddress);
+// router.get('/', backendApi.joeTokenlists);
 
 // //EMAIL Verification
 // router.post('/verify/', Auth.verify);
@@ -37,3 +39,4 @@ router.get('/', backendApi.joeTokenlists);
 // router.post('/refreshToken', refreshAuth, Auth.refreshToken);
 
 module.exports = router;
+//https://api.covalenthq.com/v1/43114/address/0x3A0060f7e429e6a8c217B8229d232E8Da506aa57/balances_v2/?key=ckey_dd1097227f0a4afb8681cc4a65c&quote-currency=USD&no-nft-fetch=true
