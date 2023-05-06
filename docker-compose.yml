@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  app:
+  everyfin_backend:
     build: .
     container_name: everyfin_backend
     ports:
@@ -10,6 +10,8 @@ services:
       - test-mongo
     environment:
       - MONGO_LOCAL_CONN_URL=mongodb://test-mongo:27017/user
+    networks:
+      - everyfin
 
   test-mongo:
     image: mongo:latest
@@ -18,3 +20,9 @@ services:
       - /var/lib/mongodb:/data/db
     ports:
       - "27017:27017"
+    networks:
+      - everyfin
+
+networks:
+  everyfin:
+    driver: bridge
